@@ -1,697 +1,931 @@
-//Fri Jun 28 2024 14:57:13 GMT+0000 (Coordinated Universal Time)
+//Fri Jun 28 2024 14:58:11 GMT+0000 (Coordinated Universal Time)
 //Base:https://github.com/echo094/decode-js
 //Modify:https://github.com/smallfawn/decode_action
-const _0x1558be = new _0x555c13("奈雪签到"),
-  _0x5c28c8 = require("crypto-js"),
-  _0x4214ca = require("dayjs");
-let _0x1c1dcf = ["\n"],
-  _0x1b4740 = "naixueCookie",
-  _0x1ee715 = (_0x1558be.isNode() ? process.env[_0x1b4740] : _0x1558be.getdata(_0x1b4740)) || "",
-  _0x6c0ae8 = [],
-  _0x21331e = 0,
-  _0x4ab923 = 0,
-  _0x1514a9 = "application/json",
-  _0x1a3f59 = "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.27(0x18001b37) NetType/WIFI Language/zh_CN miniProgram/wxab7430e6e8b9a4ab",
-  _0x88e09e = "https://tm-web.pin-dao.cn/",
-  _0x56f2bf = "https://tm-web.pin-dao.cn";
-const _0x181651 = "QL6ZOftGzbziPlZwfiXM",
-  _0x300ddb = "sArMTldQ9tqU19XIRDMWz7BO5WaeBnrezA";
-let _0x5b7fe6 = 8,
-  _0x1af5ff = 1.01,
-  _0x44a18d = "naixue",
-  _0x1247d0 = "https://leafxcy.coding.net/api/user/leafxcy/project/validcode/shared-depot/validCode/git/blob/master/code.json";
-class _0x447874 {
-  constructor(_0x1dae60) {
-    this.index = ++_0x21331e;
-    this.name = this.index;
-    this.valid = false;
-    this.auth = _0x1dae60;
+const $ = new Env("🍕达美乐披萨"),
+  ckName = "dlm_data";
+$.host = ($.isNode() ? process.env.dlm_game : $.getdata("dlm_game")) || "";
+$.gameDate = ($.isNode() ? process.env.dlm_date : $.getdata("dlm_date")) || "";
+$.score = $.toObj($.isNode() ? process.env.dlm_score : $.getdata("dlm_score")) || "false";
+$.rewardList = $.toObj($.isNode() ? process.env.dlm_reward : $.getdata("dlm_reward")) || {};
+const Notify = 1;
+const notify = $.isNode() ? require("./sendNotify") : "";
+let userCookie = $.toObj($.isNode() ? process.env[ckName] : $.getdata(ckName)) || [];
+$.userList = [];
+$.userIdx = 0;
+$.notifyMsg = [];
+async function main() {
+  console.log("\n================== 任务 ==================\n");
+  if (!$.host) {
+    return $.msg($.name, "⚠️ Script run error", "未获取活动id，请先完成一次游戏获取token");
   }
-  getBody() {
-    let _0xfcecbc = parseInt(_0x1558be.randomString(6, "123456789")),
-      _0x387ae5 = Math.floor(Date.now() / 1000),
-      _0x3c484d = "nonce=" + _0xfcecbc + "&openId=" + _0x181651 + "&timestamp=" + _0x387ae5,
-      _0x172f0c = _0x5c28c8.HmacSHA1(_0x3c484d, _0x300ddb).toString(_0x5c28c8.enc.Base64);
-    const _0x405170 = {
-      platform: "wxapp",
-      version: "4.4.23",
-      imei: "",
-      osn: "iPhone 12<iPhone13,2>",
-      sv: "iOS 15.0",
-      lang: "zh_CN",
-      currency: "CNY",
-      timeZone: "",
-      nonce: _0xfcecbc,
-      openId: _0x181651,
-      timestamp: _0x387ae5,
-      signature: _0x172f0c
-    };
-    const _0x3f81af = {
-      businessType: 1,
-      brand: 26000252,
-      tenantId: 1,
-      channel: 2,
-      stallType: null,
-      storeId: null
-    };
-    let _0x4f36fc = {
-      common: _0x405170,
-      params: _0x3f81af
-    };
-    return _0x4f36fc;
-  }
-  async taskApi(_0x3d365e = {}) {
-    let _0x192174 = {};
+  $.host = $.host.split(",");
+  $.log("当前拥有的活动id: " + $.host);
+  for (let _0xbbd4b2 of $.userList) {
     try {
-      let _0x4fd752 = _0x3d365e.url.replace("//", "/").split("/")[1],
-        _0x4293ce = _0x3d365e.url;
-      if (_0x3d365e.queryParam) {
-        _0x4293ce += "?" + _0x1558be.json2str(_0x3d365e.queryParam, "&", true);
-      }
-      let _0x49f7b0 = {
-        url: _0x4293ce,
-        headers: {
-          Host: _0x4fd752,
-          Connection: "keep-alive",
-          "User-Agent": _0x1a3f59,
-          Authorization: "Bearer " + this.auth,
-          Referer: _0x88e09e,
-          Origin: _0x56f2bf
-        },
-        timeout: 5000
-      };
-      if (_0x3d365e.body) {
-        let _0x53f53e = this.getBody();
-        Object.assign(_0x53f53e.params, _0x3d365e.body);
-        _0x49f7b0.headers["Content-Type"] = _0x3d365e["Content-Type"] || _0x1514a9;
-        if (_0x49f7b0.headers["Content-Type"].includes("json")) {
-          _0x49f7b0.body = JSON.stringify(_0x53f53e);
-        } else {
-          for (let _0xe4d08e in _0x53f53e) {
-            typeof _0x53f53e[_0xe4d08e] === "object" && (_0x53f53e[_0xe4d08e] = JSON.stringify(_0x53f53e[_0xe4d08e]));
+      if (_0xbbd4b2.ckStatus) {
+        $.log("========================================");
+        let _0x4fee01 = [];
+        for (let _0x1c868f of $.host) {
+          console.log("账号[" + _0xbbd4b2.index + "][" + _0x1c868f + "] 开始执行任务...");
+          _0xbbd4b2.drawStatus = true;
+          let _0x275c1a = await _0xbbd4b2.getGameSatuts(_0x1c868f);
+          if (!_0x275c1a) {
+            continue;
           }
-          _0x49f7b0.body = _0x1558be.json2str(_0x53f53e, "&");
+          await _0xbbd4b2.getGameSatuts(_0x1c868f);
+          await _0xbbd4b2.todoList(_0x1c868f);
+          _0x4fee01.push(_0x1c868f);
+          $.log("========================================");
         }
-        _0x49f7b0.headers["Content-Length"] = _0x49f7b0.body ? Buffer.byteLength(_0x49f7b0.body, "utf8") : 0;
-      }
-      if (_0x3d365e.urlObjectParam) {
-        Object.assign(_0x49f7b0, _0x3d365e.urlObjectParam);
-      }
-      if (_0x3d365e.headerParam) {
-        Object.assign(_0x49f7b0.headers, _0x3d365e.headerParam);
-      }
-      _0x192174 = Object.assign({}, await _0x3f844e(_0x3d365e.method, _0x49f7b0));
-      _0x192174.statusCode = _0x192174?.["err"]?.["response"]?.["statusCode"] || _0x192174?.["resp"]?.["statusCode"];
-      _0x192174.statusCode != 200 && console.log("[" + _0x3d365e.fn + "]返回[" + _0x192174.statusCode + "]");
-      if (_0x192174?.["resp"]?.["body"]) {
-        if (typeof _0x192174.resp.body === "object") {
-          _0x192174.result = _0x192174.resp.body;
-        } else {
-          try {
-            _0x192174.result = JSON.parse(_0x192174.resp.body);
-          } catch (_0x428503) {
-            _0x192174.result = _0x192174.resp.body;
-          }
-        }
-      }
-    } catch (_0x11f957) {
-      console.log(_0x11f957);
-    } finally {
-      return Promise.resolve(_0x192174);
-    }
-  }
-  async baseUserinfo() {
-    let _0x1d6ad7 = {};
-    try {
-      let _0x2232f8 = {
-        fn: "baseUserinfo",
-        method: "post",
-        url: "https://tm-web.pin-dao.cn/user/base-userinfo",
-        body: {}
-      };
-      _0x1d6ad7 = Object.assign({}, await this.taskApi(_0x2232f8));
-      let _0x55da9f = _0x1d6ad7.result;
-      if (_0x55da9f.code == 0) {
-        this.valid = true;
-        this.name = _0x55da9f.data.phone;
-        console.log("账号[" + this.index + "][" + this.name + "]登录成功");
-        await this.signRecord();
-        await this.userAccount();
+        $.log("所有活动处理完毕");
+        $.setdata(_0x4fee01.join(","), "dlm_game");
       } else {
-        console.log("账号[" + this.index + "]登录失败: " + _0x55da9f.message);
+        $.notifyMsg.push("❌账号" + _0xbbd4b2.index + " >> Check ck error!");
       }
-    } catch (_0xc6ead1) {
-      console.log(_0xc6ead1);
-    } finally {
-      return Promise.resolve(_0x1d6ad7);
+    } catch (_0xc4dfd8) {
+      $.log(_0xc4dfd8);
     }
   }
-  async userAccount() {
-    let _0x53d895 = {};
-    try {
-      let _0x1b993f = {
-        fn: "userAccount",
-        method: "post",
-        url: "https://tm-web.pin-dao.cn/user/account/user-account",
-        body: {}
-      };
-      _0x53d895 = Object.assign({}, await this.taskApi(_0x1b993f));
-      let _0x533188 = _0x53d895.result;
-      _0x533188.code == 0 ? (this.coin = _0x533188.data.coin, _0x1558be.logAndNotify("账号[" + this.index + "][" + this.name + "]奈雪币: " + this.coin)) : _0x1558be.logAndNotify("账号[" + this.index + "][" + this.name + "]查询奈雪币失败: " + _0x533188.message);
-    } catch (_0x4e82c2) {
-      console.log(_0x4e82c2);
-    } finally {
-      return Promise.resolve(_0x53d895);
-    }
+  $.setjson($.rewardList, "dlm_reward");
+}
+class UserInfo {
+  constructor(_0x588007) {
+    this.index = ++$.userIdx;
+    this.openid = "" + _0x588007.userId;
+    this.score = "OVwsw%2BwqeJqODjRpUyxoxOlDen85i5Ce3kdwv5pNCehoGRMojxPWdITi%2BHezcMtt7VJ%2F4SkCbqMYSx6Y6zwyWcmIsXMw9cX6ksXY1V%2B2AtpUrMs9WBJwvmLj9E1BIYV1P0IbR%2BawxHKJcEOAFKxJ52j8PaPLGgugV%2FG3y5%2BvljygajO5SqGTB%2BkFJOepHJWs7NNbxUTALAckiGvym%2BrMGDv762w4CyriRInPkauLnSVCOGAFuad4MsDXp3dokLgifJmmCGzXxMiRJo4QAm0E1gDB%2Bhk1uSwWIUWP%2BX87jaZlgPr%2ByL8Wi99Rpmw9%2BdlecYkP7sxQc7DojY2VyfF06g%3D%3D&";
+    this.body = _0x588007.token;
+    this.ckStatus = true;
+    this.drawStatus = true;
+    this.sharingStatus = true;
+    const _0xe7ca23 = {
+      "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.42(0x18002a2c) NetType/WIFI Language/zh_CN",
+      "Content-Type": "application/x-www-form-urlencoded"
+    };
+    this.headers = _0xe7ca23;
   }
-  async signRecord() {
-    let _0x4a0b3c = {};
-    try {
-      let _0xf082e5 = _0x4214ca().startOf("month").format("YYYY-MM-DD"),
-        _0x4a8803 = _0x4214ca().format("YYYY-MM-DD");
-      const _0x3d8ba6 = {
-        signDate: _0xf082e5,
-        startDate: _0x4a8803
-      };
-      let _0x4c2fd6 = {
-        fn: "signRecord",
-        method: "post",
-        url: "https://tm-web.pin-dao.cn/user/sign/records",
-        body: _0x3d8ba6
-      };
-      _0x4a0b3c = Object.assign({}, await this.taskApi(_0x4c2fd6));
-      let _0x2c3d91 = _0x4a0b3c.result;
-      _0x2c3d91.code == 0 ? (console.log("今天" + (_0x2c3d91.data.status ? "已" : "未") + "签到，已签到" + _0x2c3d91.data.signCount + "天"), !_0x2c3d91.data.status && (await this.signSave())) : console.log("查询签到失败: " + _0x2c3d91.message);
-    } catch (_0x32006d) {
-      console.log(_0x32006d);
-    } finally {
-      return Promise.resolve(_0x4a0b3c);
-    }
+  getRandomTime() {
+    return randomInt(1000, 3000);
   }
-  async signSave() {
-    let _0x18ba5b = {};
+  async gameDone(_0x4e8c17) {
     try {
-      let _0x3fd188 = _0x4214ca().format("YYYY-MM-DD");
-      const _0x434606 = {
-        signDate: _0x3fd188
+      let _0x58fd04 = $.score != "false" ? $.queryStr({
+        openid: this.openid,
+        score: this.score,
+        tempId: "null"
+      }) : this.body;
+      const _0x2aa6d1 = {
+        url: "https://game.dominos.com.cn/" + _0x4e8c17 + "/game/gameDone",
+        headers: this.headers,
+        body: _0x58fd04
       };
-      let _0x3611f0 = {
-        fn: "signSave",
-        method: "post",
-        url: "https://tm-web.pin-dao.cn/user/sign/save",
-        body: _0x434606
-      };
-      _0x18ba5b = Object.assign({}, await this.taskApi(_0x3611f0));
-      let _0x2215c8 = _0x18ba5b.result;
-      _0x2215c8.code == 0 ? _0x2215c8.data.flag ? console.log("签到成功") : console.log("今天已经签到过了") : console.log("签到失败: " + _0x2215c8.message);
-    } catch (_0x1c4407) {
-      console.log(_0x1c4407);
-    } finally {
-      return Promise.resolve(_0x18ba5b);
-    }
-  }
-  async userTask() {
-    let _0xf7d672 = {};
-    try {
-      console.log("\n============= 账号[" + this.index + "] =============");
-      await this.baseUserinfo();
-      if (!this.valid) {
-        return Promise.resolve(_0xf7d672);
+      let _0x588aac = await httpRequest(_0x2aa6d1);
+      if (_0x588aac?.["statusCode"] == 0) {
+        console.log("账号[" + this.index + "][" + _0x4e8c17 + "] 抽奖成功!获得" + _0x588aac?.["content"]?.["name"]);
+        let _0x5bf348 = _0x588aac?.["content"]["name"]["replace"](/(奖\-[1-9]\：|奖\：)/g, "奖 ")["replace"]("一张", "")["replace"]("1份", "")["replace"]("1张", "");
+        $.rewardList[_0x588aac?.["content"]["id"]] = _0x5bf348;
+      } else {
+        console.log("账号[" + this.index + "][" + _0x4e8c17 + "] " + _0x588aac?.["errorMessage"]);
+        this.drawStatus = false;
       }
-    } catch (_0x23d8b6) {
-      console.log(_0x23d8b6);
-    } finally {
-      return Promise.resolve(_0xf7d672);
+    } catch (_0x35fc9f) {
+      console.log(_0x35fc9f);
     }
+  }
+  async sharingDone(_0x55de80) {
+    try {
+      const _0x5e330b = {
+        url: "https://game.dominos.com.cn/" + _0x55de80 + "/game/sharingDone",
+        headers: this.headers,
+        body: "openid=" + this.openid + "&from=1&target=0"
+      };
+      let _0x513359 = await httpRequest(_0x5e330b);
+      if (_0x513359?.["statusCode"] == 0) {
+        console.log("账号[" + this.index + "][" + _0x55de80 + "] 分享成功,抽奖次数+" + _0x513359?.["content"]?.["gameNum"]);
+      } else {
+        console.log("账号[" + this.index + "][" + _0x55de80 + "] " + _0x513359?.["errorMessage"]);
+        this.sharingStatus = false;
+      }
+    } catch (_0x240928) {
+      console.log(_0x240928);
+    }
+  }
+  async todoList(_0x107013) {
+    let _0x4e09e2 = 1;
+    do {
+      await this.sharingDone(_0x107013);
+    } while (this.sharingStatus && _0x4e09e2++ <= 10);
+    _0x4e09e2 = 0;
+    do {
+      await this.gameDone(_0x107013);
+    } while (this.drawStatus && _0x4e09e2++ <= 12);
+    await this.point(_0x107013);
+  }
+  async getGameSatuts(_0x57a236) {
+    try {
+      const _0x8c7ec9 = {
+        url: "https://game.dominos.com.cn/" + _0x57a236 + "/getUser?openid=" + this.openid,
+        headers: this.headers
+      };
+      let _0x18edd3 = (await httpRequest(_0x8c7ec9)) ?? "本期活动已经结束";
+      if (_0x18edd3?.["statusCode"] == 0) {
+        return true;
+      }
+      console.log("账号[" + this.index + "][" + _0x57a236 + "] 本期活动已结束，跳过任务");
+    } catch (_0x1119b0) {
+      console.log(_0x1119b0);
+    }
+  }
+  async point(_0x1cf70b) {
+    try {
+      const _0xe1b1ff = {
+        url: "https://game.dominos.com.cn/" + _0x1cf70b + "/game/myPrize?openid=" + this.openid + "&pageSize=1000&pageNum=1",
+        headers: this.headers
+      };
+      let _0x10809c = await httpRequest(_0xe1b1ff);
+      if (_0x10809c?.["statusCode"] == 0) {
+        let _0xd2eba = $.SakuraUtils.getTotal(_0x10809c?.["content"]["filter"](_0x442a9d => parseInt(_0x442a9d.num) >= 1), "id");
+        DoubleLog("账号[" + $.SakuraUtils.phone_num(_0x10809c?.["extra"]) + "][" + _0x1cf70b + "] 奖品:");
+        const _0x6beb90 = {
+          "001": _0x48e30e.ajnXp,
+          "002": _0x48e30e.eMGKB,
+          "003": _0x48e30e.TusiI,
+          "004": _0x48e30e.feqjr,
+          "005": _0x48e30e.QoviK
+        };
+        _0x6beb90["001"] = "一等奖";
+        _0x6beb90["002"] = "二等奖";
+        _0x6beb90["003"] = "三等奖";
+        _0x6beb90["004"] = "四等奖";
+        _0x6beb90["005"] = "五等奖";
+        _0x6beb90["005"] = "五等奖";
+        _0x6beb90["006"] = "五等奖";
+        _0x6beb90["007"] = "五等奖";
+        _0x6beb90["008"] = "五等奖";
+        _0x6beb90["009"] = "五等奖";
+        let _0x3e32b6 = _0x6beb90;
+        _0xd2eba = _0xd2eba.sort((_0x1d4dbe, _0x2da2f6) => parseInt(_0x1d4dbe.name) - parseInt(_0x2da2f6.name));
+        for (let _0x2d70bf of _0xd2eba) {
+          $.rewardList[_0x2d70bf.name] ? DoubleLog($.rewardList[_0x2d70bf.name] + "x" + _0x2d70bf.value) : DoubleLog(_0x3e32b6[_0x2d70bf.name] + " 免费未知奖品券x" + _0x2d70bf.value);
+        }
+      } else {
+        console.log("❌" + _0x10809c?.["errorMessage"]);
+      }
+    } catch (_0x3b913e) {
+      console.log(_0x3b913e);
+    }
+  }
+}
+async function getCookie() {
+  try {
+    if ($request && $request.method === "OPTIONS") {
+      return;
+    }
+    const {
+      openid: _0x304c21
+    } = UrlToJson($request.body) ?? {};
+    let _0x23315f = /^https:\/\/game\.dominos\.com\.cn\/(.+)\/game\/gameDone/;
+    const [, _0xfa3eb6] = _0x23315f.exec($request.url);
+    if (!($request.body && _0xfa3eb6)) {
+      throw new Error("❌获取签到Cookie失败!");
+    }
+    const _0x48819b = {
+      userId: _0x304c21,
+      token: $request.body,
+      userName: _0x304c21
+    };
+    userCookie = $.toObj(userCookie) || [];
+    const _0x47ac11 = userCookie.findIndex(_0x2c17b1 => _0x2c17b1.userId == _0x48819b.userId);
+    userCookie[_0x47ac11] ? userCookie[_0x47ac11] = _0x48819b : userCookie.push(_0x48819b);
+    $.setdata(_0xfa3eb6, "dlm_game");
+    $.setjson(userCookie, ckName);
+    $.msg($.name, "🎉获取签到Cookie成功!", "openid: " + _0x304c21 + "\ngame: " + _0xfa3eb6);
+  } catch (_0x2cb067) {
+    throw _0x2cb067;
   }
 }
 !(async () => {
-  if (typeof $request !== "undefined") {
-    await _0x13596c();
-  } else {
-    if (!(await _0x511dd6())) {
-      return;
-    }
-    if (!_0x392a60()) {
-      return;
-    }
-    for (let _0x3e5eaf of _0x6c0ae8) {
-      await _0x3e5eaf.userTask();
-    }
+  if (typeof $request != "undefined") {
+    await getCookie();
+    return;
   }
-})().catch(_0x270e22 => console.log(_0x270e22)).finally(() => _0x1558be.done());
-async function _0x13596c() {
-  if ($request.url.includes("user/base-userinfo")) {
-    try {
-      let _0x2d95f1 = $request.headers.Authorization.replace("Bearer ", ""),
-        _0x3fd741 = _0x1c1dcf[0];
-      for (let _0x104a7f of _0x1c1dcf) {
-        if (_0x1ee715?.["includes"](_0x104a7f)) {
-          _0x3fd741 = _0x104a7f;
-          break;
-        }
-      }
-      if (!_0x1ee715?.["includes"](id)) {
-        let _0x309da5 = _0x1ee715 ? _0x1ee715.split(_0x3fd741) : [];
-        _0x309da5.push(_0x2d95f1);
-        _0x1ee715 = _0x309da5.join(_0x3fd741);
-        _0x1558be.setdata(_0x1ee715, _0x1b4740);
-        _0x1558be.msg("获取第" + _0x309da5.length + "个账户CK成功，保存到变量[" + _0x1b4740 + "]: " + _0x2d95f1);
-      } else {
-        let _0x4d1628 = _0x1ee715.split(_0x3fd741);
-        for (let _0x18a74a in _0x4d1628) {
-          console.log(_0x18a74a);
-          if (_0x4d1628[_0x18a74a]?.["includes"](id)) {
-            _0x4d1628[_0x18a74a] = _0x2d95f1;
-            _0x1558be.msg("更新第" + (Number(_0x18a74a) + 1) + "个账户CK成功，保存到变量[" + _0x1b4740 + "]: " + _0x2d95f1);
-            break;
-          }
-        }
-        _0x1ee715 = _0x4d1628.join(_0x3fd741);
-        _0x1558be.setdata(_0x1ee715, _0x1b4740);
-      }
-    } catch (_0x312dfd) {}
+  if (!(await loadModule())) {
+    throw new Error("❌加载模块失败，请检查模块路径是否正常");
   }
+  await checkEnv();
+  await main();
+})().catch(_0x22d900 => $.notifyMsg.push(_0x22d900.message || _0x22d900)).finally(async () => {
+  await SendMsg($.notifyMsg.join("\n"));
+  $.done();
+});
+function UrlToJson(_0x2bbe5d) {
+  let _0x4d8917 = _0x2bbe5d.split("&"),
+    _0x27119e = {};
+  for (let _0x280d66 of _0x4d8917) {
+    let _0x5e97fc = _0x280d66.split("="),
+      _0x39535e = _0x5e97fc[0],
+      _0x1e6b54 = decodeURIComponent(_0x5e97fc[1]);
+    _0x27119e["" + _0x39535e] = _0x1e6b54;
+  }
+  return _0x27119e;
 }
-function _0x392a60() {
-  if (_0x1ee715) {
-    let _0x4695da = _0x1c1dcf[0];
-    for (let _0x3fa23f of _0x1c1dcf) {
-      if (_0x1ee715.indexOf(_0x3fa23f) > -1) {
-        _0x4695da = _0x3fa23f;
-        break;
-      }
-    }
-    for (let _0x192f55 of _0x1ee715.split(_0x4695da)) {
-      if (_0x192f55) {
-        _0x6c0ae8.push(new _0x447874(_0x192f55));
-      }
-    }
-    _0x4ab923 = _0x6c0ae8.length;
-  } else {
-    console.log("未找到CK: " + _0x1b4740);
-    return false;
-  }
-  console.log("共找到" + _0x4ab923 + "个账号");
-  return true;
+function DoubleLog(_0x4e8eae) {
+  $.isNode() ? _0x4e8eae && (console.log("" + _0x4e8eae), $.notifyMsg.push("" + _0x4e8eae)) : (console.log("" + _0x4e8eae), $.notifyMsg.push("" + _0x4e8eae));
 }
-async function _0x511dd6(_0x33bba8 = 0) {
-  let _0x40ca20 = false;
+function randomInt(_0x1c8171, _0x358abd) {
+  return Math.round(Math.random() * (_0x358abd - _0x1c8171) + _0x1c8171);
+}
+async function SendMsg(_0x148fec) {
+  if (!_0x148fec) {
+    return;
+  }
+  Notify > 0 ? $.isNode() ? await notify.sendNotify($.name, _0x148fec) : $.msg($.name, $.gameDate ? "活动时间:" + $.gameDate : "", _0x148fec) : console.log(_0x148fec);
+}
+async function loadModule() {
+  $.SakuraUtils = await loadSakuraUtils();
+  return $.SakuraUtils ? true : false;
+}
+async function checkEnv() {
   try {
-    let _0x17224a = {
-        url: _0x1247d0,
-        timeout: 5000
-      },
-      _0xdf6b71 = null,
-      _0x5bf14b = await _0x3f844e("get", _0x17224a);
-    if (_0x5bf14b.err) {
-      console.log("服务器错误[" + _0x5bf14b?.["resp"]?.["statusCode"] + "]，重试...");
-    } else {
-      try {
-        _0xdf6b71 = JSON.parse(_0x5bf14b.resp.body);
-        _0xdf6b71 = JSON.parse(_0xdf6b71.data.file.data);
-      } catch (_0x1a0777) {
-        console.log(_0x1a0777);
-      }
+    if (!userCookie?.length) {
+      throw new Error("no available accounts found");
     }
-    if (!_0xdf6b71) {
-      if (_0x33bba8 < _0x5b7fe6) {
-        _0x40ca20 = await _0x511dd6(++_0x33bba8);
-      }
-    } else {
-      _0xdf6b71?.["commonNotify"] && _0xdf6b71.commonNotify.length > 0 && _0x1558be.logAndNotify(_0xdf6b71.commonNotify.join("\n") + "\n", false);
-      _0xdf6b71?.["commonMsg"] && _0xdf6b71.commonMsg.length > 0 && console.log(_0xdf6b71.commonMsg.join("\n") + "\n");
-      if (_0xdf6b71[_0x44a18d]) {
-        let _0x232651 = _0xdf6b71[_0x44a18d];
-        _0x232651.status == 0 ? _0x1af5ff >= _0x232651.version ? (_0x40ca20 = true, console.log(_0x232651.msg[_0x232651.status]), console.log(_0x232651.updateMsg), console.log("现在运行的脚本版本是：" + _0x1af5ff + "，最新脚本版本：" + _0x232651.latestVersion)) : console.log(_0x232651.versionMsg) : console.log(_0x232651.msg[_0x232651.status]);
-      } else {
-        console.log(_0xdf6b71.errorMsg);
-      }
-    }
-  } catch (_0x276f70) {
-    console.log(_0x276f70);
-  } finally {
-    return Promise.resolve(_0x40ca20);
+    $.log(`\n[INFO] 检测到 ${userCookie?.length ?? 0} 个账号\n`);
+    $.userList.push(...userCookie.map(o => new UserInfo(o)).filter(Boolean));
+  } catch (o) {
+    throw o;
   }
 }
-async function _0x3f844e(_0x38f768, _0x522013) {
-  return new Promise(_0x54c634 => {
-    _0x1558be.send(_0x38f768, _0x522013, async (_0x1c61f8, _0x40d8a2, _0x1f4289) => {
-      const _0x125eea = {
-        err: _0x1c61f8,
-        req: _0x40d8a2,
-        resp: _0x1f4289
-      };
-      _0x54c634(_0x125eea);
+async function loadSakuraUtils() {
+  let code = ($.isNode() ? process.env.SakuraUtil_code : $.getdata("SakuraUtil_code")) || "";
+  if (code && Object.keys(code).length) {
+    console.log(`✅${$.name}:缓存中存在SakuraUtil代码,跳过下载`);
+    eval(code);
+    return creatUtils();
+  }
+  console.log(`🚀${$.name}:开始下载SakuraUtil代码`);
+  return new Promise(async resolve => {
+    $.getScript("https://cdn.jsdelivr.net/gh/Sliverkiss/QuantumultX@main/Utils/SakuraUtil.js").then(fn => {
+      $.setdata(fn, "SakuraUtil_code");
+      eval(fn);
+      const SakuraUtil = creatUtils();
+      console.log(`✅SakuraUtil加载成功,请继续`);
+      resolve(SakuraUtil);
     });
   });
 }
-function _0x555c13(_0x414333, _0x174318) {
-  "undefined" != typeof process && JSON.stringify(process.env).indexOf("GITHUB") > -1 && process.exit(0);
+function httpRequest(options, method) {
+  typeof method === "undefined" ? "body" in options ? method = "post" : method = "get" : method = method;
+  return new Promise(resolve => {
+    $[method](options, (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${method}请求失败`);
+          $.logErr(err);
+        } else {
+          if (data) {
+            typeof $.toObj(data) == "object" ? data = $.toObj(data) : data = data;
+            resolve(data);
+          } else {
+            console.log(`请求api返回数据为空，请检查自身原因`);
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp);
+      } finally {
+        resolve();
+      }
+    });
+  });
+}
+function Env(t, e) {
+  class s {
+    constructor(t) {
+      this.env = t;
+    }
+    send(t, e = "GET") {
+      t = "string" == typeof t ? {
+        url: t
+      } : t;
+      let s = this.get;
+      "POST" === e && (s = this.post);
+      return new Promise((e, i) => {
+        s.call(this, t, (t, s, o) => {
+          t ? i(t) : e(s);
+        });
+      });
+    }
+    get(t) {
+      return this.send.call(this.env, t);
+    }
+    post(t) {
+      return this.send.call(this.env, t, "POST");
+    }
+  }
   return new class {
-    constructor(_0x74d04f, _0x3c955f) {
-      this.name = _0x74d04f;
-      this.notifyStr = "";
-      this.notifyFlag = false;
+    constructor(t, e) {
+      this.logLevels = {
+        debug: 0,
+        info: 1,
+        warn: 2,
+        error: 3
+      };
+      this.logLevelPrefixs = {
+        debug: "[DEBUG] ",
+        info: "[INFO] ",
+        warn: "[WARN] ",
+        error: "[ERROR] "
+      };
+      this.logLevel = "info";
+      this.name = t;
+      this.http = new s(this);
+      this.data = null;
+      this.dataFile = "box.dat";
+      this.logs = [];
+      this.isMute = !1;
+      this.isNeedRewrite = !1;
+      this.logSeparator = "\n";
+      this.encoding = "utf-8";
       this.startTime = new Date().getTime();
-      Object.assign(this, _0x3c955f);
-      console.log(this.name + " 开始运行：\n");
+      Object.assign(this, e);
+      this.log("", `🔔${this.name}, 开始!`);
+    }
+    getEnv() {
+      return "undefined" != typeof $environment && $environment["surge-version"] ? "Surge" : "undefined" != typeof $environment && $environment["stash-version"] ? "Stash" : "undefined" != typeof module && module.exports ? "Node.js" : "undefined" != typeof $task ? "Quantumult X" : "undefined" != typeof $loon ? "Loon" : "undefined" != typeof $rocket ? "Shadowrocket" : void 0;
     }
     isNode() {
-      return "undefined" != typeof module && !!module.exports;
+      return "Node.js" === this.getEnv();
     }
     isQuanX() {
-      return "undefined" != typeof $task;
+      return "Quantumult X" === this.getEnv();
     }
     isSurge() {
-      return "undefined" != typeof $httpClient && "undefined" == typeof $loon;
+      return "Surge" === this.getEnv();
     }
     isLoon() {
-      return "undefined" != typeof $loon;
+      return "Loon" === this.getEnv();
     }
-    getdata(_0x8c45c0) {
-      let _0x296859 = this.getval(_0x8c45c0);
-      if (/^@/.test(_0x8c45c0)) {
-        const [, _0x153872, _0x984855] = /^@(.*?)\.(.*?)$/.exec(_0x8c45c0),
-          _0x5e22ed = _0x153872 ? this.getval(_0x153872) : "";
-        if (_0x5e22ed) {
-          try {
-            const _0x593dac = JSON.parse(_0x5e22ed);
-            _0x296859 = _0x593dac ? this.lodash_get(_0x593dac, _0x984855, "") : _0x296859;
-          } catch (_0x8f28ce) {
-            _0x296859 = "";
-          }
-        }
+    isShadowrocket() {
+      return "Shadowrocket" === this.getEnv();
+    }
+    isStash() {
+      return "Stash" === this.getEnv();
+    }
+    toObj(t, e = null) {
+      try {
+        return JSON.parse(t);
+      } catch {
+        return e;
       }
-      return _0x296859;
     }
-    setdata(_0x51cdb9, _0xd7d5b1) {
-      let _0xaf7a5c = !1;
-      if (/^@/.test(_0xd7d5b1)) {
-        const [, _0x43558d, _0x5c3226] = /^@(.*?)\.(.*?)$/.exec(_0xd7d5b1),
-          _0x52f1f3 = this.getval(_0x43558d),
-          _0x5cda88 = _0x43558d ? "null" === _0x52f1f3 ? null : _0x52f1f3 || "{}" : "{}";
+    toStr(t, e = null, ...s) {
+      try {
+        return JSON.stringify(t, ...s);
+      } catch {
+        return e;
+      }
+    }
+    getjson(t, e) {
+      let s = e;
+      if (this.getdata(t)) {
         try {
-          const _0x59ca60 = JSON.parse(_0x5cda88);
-          this.lodash_set(_0x59ca60, _0x5c3226, _0x51cdb9);
-          _0xaf7a5c = this.setval(JSON.stringify(_0x59ca60), _0x43558d);
-        } catch (_0x29dcd7) {
-          const _0x507eb5 = {};
-          this.lodash_set(_0x507eb5, _0x5c3226, _0x51cdb9);
-          _0xaf7a5c = this.setval(JSON.stringify(_0x507eb5), _0x43558d);
+          s = JSON.parse(this.getdata(t));
+        } catch {}
+      }
+      return s;
+    }
+    setjson(t, e) {
+      try {
+        return this.setdata(JSON.stringify(t), e);
+      } catch {
+        return !1;
+      }
+    }
+    getScript(t) {
+      return new Promise(e => {
+        this.get({
+          url: t
+        }, (t, s, i) => e(i));
+      });
+    }
+    runScript(t, e) {
+      return new Promise(s => {
+        let i = this.getdata("@chavy_boxjs_userCfgs.httpapi");
+        i = i ? i.replace(/\n/g, "").trim() : i;
+        let o = this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");
+        o = o ? 1 * o : 20;
+        o = e && e.timeout ? e.timeout : o;
+        const [r, a] = i.split("@"),
+          n = {
+            url: `http://${a}/v1/scripting/evaluate`,
+            body: {
+              script_text: t,
+              mock_type: "cron",
+              timeout: o
+            },
+            headers: {
+              "X-Key": r,
+              Accept: "*/*"
+            },
+            timeout: o
+          };
+        this.post(n, (t, e, i) => s(i));
+      }).catch(t => this.logErr(t));
+    }
+    loaddata() {
+      if (!this.isNode()) {
+        return {};
+      }
+      {
+        this.fs = this.fs ? this.fs : require("fs");
+        this.path = this.path ? this.path : require("path");
+        const t = this.path.resolve(this.dataFile),
+          e = this.path.resolve(process.cwd(), this.dataFile),
+          s = this.fs.existsSync(t),
+          i = !s && this.fs.existsSync(e);
+        if (!s && !i) {
+          return {};
         }
-      } else {
-        _0xaf7a5c = this.setval(_0x51cdb9, _0xd7d5b1);
-      }
-      return _0xaf7a5c;
-    }
-    getval(_0x4ecc89) {
-      return this.isSurge() || this.isLoon() ? $persistentStore.read(_0x4ecc89) : this.isQuanX() ? $prefs.valueForKey(_0x4ecc89) : this.isNode() ? (this.data = this.loaddata(), this.data[_0x4ecc89]) : this.data && this.data[_0x4ecc89] || null;
-    }
-    setval(_0x23a07e, _0x13baa2) {
-      return this.isSurge() || this.isLoon() ? $persistentStore.write(_0x23a07e, _0x13baa2) : this.isQuanX() ? $prefs.setValueForKey(_0x23a07e, _0x13baa2) : this.isNode() ? (this.data = this.loaddata(), this.data[_0x13baa2] = _0x23a07e, this.writedata(), !0) : this.data && this.data[_0x13baa2] || null;
-    }
-    send(_0x2a3fea, _0x35efd6, _0x347778 = () => {}) {
-      if (_0x2a3fea != "get" && _0x2a3fea != "post" && _0x2a3fea != "put" && _0x2a3fea != "delete") {
-        console.log("无效的http方法：" + _0x2a3fea);
-        return;
-      }
-      if (_0x2a3fea == "get" && _0x35efd6.headers) {
-        delete _0x35efd6.headers["Content-Type"];
-        delete _0x35efd6.headers["Content-Length"];
-      } else {
-        if (_0x35efd6.body && _0x35efd6.headers) {
-          if (!_0x35efd6.headers["Content-Type"]) {
-            _0x35efd6.headers["Content-Type"] = "application/x-www-form-urlencoded";
+        {
+          const i = s ? t : e;
+          try {
+            return JSON.parse(this.fs.readFileSync(i));
+          } catch (t) {
+            return {};
           }
         }
       }
-      if (this.isSurge() || this.isLoon()) {
-        if (this.isSurge() && this.isNeedRewrite) {
-          _0x35efd6.headers = _0x35efd6.headers || {};
-          const _0x1866da = {
+    }
+    writedata() {
+      if (this.isNode()) {
+        this.fs = this.fs ? this.fs : require("fs");
+        this.path = this.path ? this.path : require("path");
+        const t = this.path.resolve(this.dataFile),
+          e = this.path.resolve(process.cwd(), this.dataFile),
+          s = this.fs.existsSync(t),
+          i = !s && this.fs.existsSync(e),
+          o = JSON.stringify(this.data);
+        s ? this.fs.writeFileSync(t, o) : i ? this.fs.writeFileSync(e, o) : this.fs.writeFileSync(t, o);
+      }
+    }
+    lodash_get(t, e, s) {
+      const i = e.replace(/\[(\d+)\]/g, ".$1").split(".");
+      let o = t;
+      for (const t of i) if (o = Object(o)[t], void 0 === o) {
+        return s;
+      }
+      return o;
+    }
+    lodash_set(t, e, s) {
+      Object(t) !== t || (Array.isArray(e) || (e = e.toString().match(/[^.[\]]+/g) || []), e.slice(0, -1).reduce((t, s, i) => Object(t[s]) === t[s] ? t[s] : t[s] = Math.abs(e[i + 1]) >> 0 == +e[i + 1] ? [] : {}, t)[e[e.length - 1]] = s);
+      return t;
+    }
+    getdata(t) {
+      let e = this.getval(t);
+      if (/^@/.test(t)) {
+        const [, s, i] = /^@(.*?)\.(.*?)$/.exec(t),
+          o = s ? this.getval(s) : "";
+        if (o) {
+          try {
+            const t = JSON.parse(o);
+            e = t ? this.lodash_get(t, i, "") : e;
+          } catch (t) {
+            e = "";
+          }
+        }
+      }
+      return e;
+    }
+    setdata(t, e) {
+      let s = !1;
+      if (/^@/.test(e)) {
+        const [, i, o] = /^@(.*?)\.(.*?)$/.exec(e),
+          r = this.getval(i),
+          a = i ? "null" === r ? null : r || "{}" : "{}";
+        try {
+          const e = JSON.parse(a);
+          this.lodash_set(e, o, t);
+          s = this.setval(JSON.stringify(e), i);
+        } catch (e) {
+          const r = {};
+          this.lodash_set(r, o, t);
+          s = this.setval(JSON.stringify(r), i);
+        }
+      } else {
+        s = this.setval(t, e);
+      }
+      return s;
+    }
+    getval(t) {
+      switch (this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+          return $persistentStore.read(t);
+        case "Quantumult X":
+          return $prefs.valueForKey(t);
+        case "Node.js":
+          this.data = this.loaddata();
+          return this.data[t];
+        default:
+          return this.data && this.data[t] || null;
+      }
+    }
+    setval(t, e) {
+      switch (this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+          return $persistentStore.write(t, e);
+        case "Quantumult X":
+          return $prefs.setValueForKey(t, e);
+        case "Node.js":
+          this.data = this.loaddata();
+          this.data[e] = t;
+          this.writedata();
+          return !0;
+        default:
+          return this.data && this.data[e] || null;
+      }
+    }
+    initGotEnv(t) {
+      this.got = this.got ? this.got : require("got");
+      this.cktough = this.cktough ? this.cktough : require("tough-cookie");
+      this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar();
+      t && (t.headers = t.headers ? t.headers : {}, t && (t.headers = t.headers ? t.headers : {}, void 0 === t.headers.cookie && void 0 === t.headers.Cookie && void 0 === t.cookieJar && (t.cookieJar = this.ckjar)));
+    }
+    get(t, e = () => {}) {
+      switch (t.headers && (delete t.headers["Content-Type"], delete t.headers["Content-Length"], delete t.headers["content-type"], delete t.headers["content-length"]), t.params && (t.url += "?" + this.queryStr(t.params)), void 0 === t.followRedirect || t.followRedirect || ((this.isSurge() || this.isLoon()) && (t["auto-redirect"] = !1), this.isQuanX() && (t.opts ? t.opts.redirection = !1 : t.opts = {
+        redirection: !1
+      })), this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        default:
+          this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {
             "X-Surge-Skip-Scripting": !1
-          };
-          Object.assign(_0x35efd6.headers, _0x1866da);
-        }
-        let _0x4fba3d = {
-          method: _0x2a3fea,
-          url: _0x35efd6.url,
-          headers: _0x35efd6.headers,
-          timeout: _0x35efd6.timeout,
-          data: _0x35efd6.body
-        };
-        if (_0x2a3fea == "get") {
-          delete _0x4fba3d.data;
-        }
-        $axios(_0x4fba3d).then(_0x4e7231 => {
-          const {
-              status: _0x3cbc40,
-              request: _0x28388a,
-              headers: _0x2a6a59,
-              data: _0x357594
-            } = _0x4e7231,
-            _0xdf13b6 = {
-              statusCode: _0x3cbc40,
-              headers: _0x2a6a59,
-              body: _0x357594
-            };
-          _0x347778(null, _0x28388a, _0xdf13b6);
-        }).catch(_0x27d59f => console.log(_0x27d59f));
-      } else {
-        if (this.isQuanX()) {
-          const _0x2fe7da = {
+          }));
+          $httpClient.get(t, (t, s, i) => {
+            !t && s && (s.body = i, s.statusCode = s.status ? s.status : s.statusCode, s.status = s.statusCode);
+            e(t, s, i);
+          });
+          break;
+        case "Quantumult X":
+          this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {
             hints: !1
-          };
-          _0x35efd6.method = _0x2a3fea.toUpperCase();
-          this.isNeedRewrite && (_0x35efd6.opts = _0x35efd6.opts || {}, Object.assign(_0x35efd6.opts, _0x2fe7da));
-          $task.fetch(_0x35efd6).then(_0x580337 => {
+          }));
+          $task.fetch(t).then(t => {
             const {
-                statusCode: _0x3d2ccb,
-                request: _0x3d50fb,
-                headers: _0x32d9d9,
-                body: _0x3be451
-              } = _0x580337,
-              _0x2e3b5f = {
-                statusCode: _0x3d2ccb,
-                headers: _0x32d9d9,
-                body: _0x3be451
-              };
-            _0x347778(null, _0x3d50fb, _0x2e3b5f);
-          }, _0x59896d => _0x347778(_0x59896d));
-        } else {
-          if (this.isNode()) {
-            this.got = this.got ? this.got : require("got");
+              statusCode: s,
+              statusCode: i,
+              headers: o,
+              body: r,
+              bodyBytes: a
+            } = t;
+            e(null, {
+              status: s,
+              statusCode: i,
+              headers: o,
+              body: r,
+              bodyBytes: a
+            }, r, a);
+          }, t => e(t && t.error || "UndefinedError"));
+          break;
+        case "Node.js":
+          let s = require("iconv-lite");
+          this.initGotEnv(t);
+          this.got(t).on("redirect", (t, e) => {
+            try {
+              if (t.headers["set-cookie"]) {
+                const s = t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();
+                s && this.ckjar.setCookieSync(s, null);
+                e.cookieJar = this.ckjar;
+              }
+            } catch (t) {
+              this.logErr(t);
+            }
+          }).then(t => {
             const {
-                url: _0x4fefe6,
-                ..._0x2e66e7
-              } = _0x35efd6,
-              _0x2b5417 = {
-                followRedirect: false
-              };
-            this.instance = this.got.extend(_0x2b5417);
-            this.instance[_0x2a3fea](_0x4fefe6, _0x2e66e7).then(_0x301df6 => {
-              const {
-                  statusCode: _0x3b8a3b,
-                  request: _0x1e0124,
-                  headers: _0x2cce85,
-                  body: _0x583713
-                } = _0x301df6,
-                _0x33ffde = {
-                  statusCode: _0x3b8a3b,
-                  headers: _0x2cce85,
-                  body: _0x583713
+                statusCode: i,
+                statusCode: o,
+                headers: r,
+                rawBody: a
+              } = t,
+              n = s.decode(a, this.encoding);
+            e(null, {
+              status: i,
+              statusCode: o,
+              headers: r,
+              rawBody: a,
+              body: n
+            }, n);
+          }, t => {
+            const {
+              message: i,
+              response: o
+            } = t;
+            e(i, o, o && s.decode(o.rawBody, this.encoding));
+          });
+          break;
+      }
+    }
+    post(t, e = () => {}) {
+      const s = t.method ? t.method.toLocaleLowerCase() : "post";
+      switch (t.body && t.headers && !t.headers["Content-Type"] && !t.headers["content-type"] && (t.headers["content-type"] = "application/x-www-form-urlencoded"), t.headers && (delete t.headers["Content-Length"], delete t.headers["content-length"]), void 0 === t.followRedirect || t.followRedirect || ((this.isSurge() || this.isLoon()) && (t["auto-redirect"] = !1), this.isQuanX() && (t.opts ? t.opts.redirection = !1 : t.opts = {
+        redirection: !1
+      })), this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        default:
+          this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {
+            "X-Surge-Skip-Scripting": !1
+          }));
+          $httpClient[s](t, (t, s, i) => {
+            !t && s && (s.body = i, s.statusCode = s.status ? s.status : s.statusCode, s.status = s.statusCode);
+            e(t, s, i);
+          });
+          break;
+        case "Quantumult X":
+          t.method = s;
+          this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {
+            hints: !1
+          }));
+          $task.fetch(t).then(t => {
+            const {
+              statusCode: s,
+              statusCode: i,
+              headers: o,
+              body: r,
+              bodyBytes: a
+            } = t;
+            e(null, {
+              status: s,
+              statusCode: i,
+              headers: o,
+              body: r,
+              bodyBytes: a
+            }, r, a);
+          }, t => e(t && t.error || "UndefinedError"));
+          break;
+        case "Node.js":
+          let i = require("iconv-lite");
+          this.initGotEnv(t);
+          const {
+            url: o,
+            ...r
+          } = t;
+          this.got[s](o, r).then(t => {
+            const {
+                statusCode: s,
+                statusCode: o,
+                headers: r,
+                rawBody: a
+              } = t,
+              n = i.decode(a, this.encoding);
+            e(null, {
+              status: s,
+              statusCode: o,
+              headers: r,
+              rawBody: a,
+              body: n
+            }, n);
+          }, t => {
+            const {
+              message: s,
+              response: o
+            } = t;
+            e(s, o, o && i.decode(o.rawBody, this.encoding));
+          });
+          break;
+      }
+    }
+    time(t, e = null) {
+      const s = e ? new Date(e) : new Date();
+      let i = {
+        "M+": s.getMonth() + 1,
+        "d+": s.getDate(),
+        "H+": s.getHours(),
+        "m+": s.getMinutes(),
+        "s+": s.getSeconds(),
+        "q+": Math.floor((s.getMonth() + 3) / 3),
+        S: s.getMilliseconds()
+      };
+      /(y+)/.test(t) && (t = t.replace(RegExp.$1, (s.getFullYear() + "").substr(4 - RegExp.$1.length)));
+      for (let e in i) new RegExp("(" + e + ")").test(t) && (t = t.replace(RegExp.$1, 1 == RegExp.$1.length ? i[e] : ("00" + i[e]).substr(("" + i[e]).length)));
+      return t;
+    }
+    queryStr(t) {
+      let e = "";
+      for (const s in t) {
+        let i = t[s];
+        null != i && "" !== i && ("object" == typeof i && (i = JSON.stringify(i)), e += `${s}=${i}&`);
+      }
+      e = e.substring(0, e.length - 1);
+      return e;
+    }
+    msg(e = t, s = "", i = "", o = {}) {
+      const r = t => {
+        const {
+          $open: e,
+          $copy: s,
+          $media: i,
+          $mediaMime: o
+        } = t;
+        switch (typeof t) {
+          case void 0:
+            return t;
+          case "string":
+            switch (this.getEnv()) {
+              case "Surge":
+              case "Stash":
+              default:
+                return {
+                  url: t
                 };
-              _0x347778(null, _0x1e0124, _0x33ffde);
-            }, _0x3dd0ee => {
-              const {
-                message: _0x1fa93c,
-                request: _0x462e08,
-                response: _0x115ddb
-              } = _0x3dd0ee;
-              _0x347778(_0x1fa93c, _0x462e08, _0x115ddb);
-            });
-          }
-        }
-      }
-    }
-    time(_0xc16e28, _0x4ab7f6 = null) {
-      let _0x4a784c = _0x4ab7f6 ? new Date(_0x4ab7f6) : new Date(),
-        _0x4cb401 = {
-          "M+": _0x4a784c.getMonth() + 1,
-          "d+": _0x4a784c.getDate(),
-          "h+": _0x4a784c.getHours(),
-          "m+": _0x4a784c.getMinutes(),
-          "s+": _0x4a784c.getSeconds(),
-          "q+": Math.floor((_0x4a784c.getMonth() + 3) / 3),
-          S: this.padStr(_0x4a784c.getMilliseconds(), 3)
-        };
-      /(y+)/.test(_0xc16e28) && (_0xc16e28 = _0xc16e28.replace(RegExp.$1, (_0x4a784c.getFullYear() + "").substr(4 - RegExp.$1.length)));
-      for (let _0xeba19 in _0x4cb401) new RegExp("(" + _0xeba19 + ")").test(_0xc16e28) && (_0xc16e28 = _0xc16e28.replace(RegExp.$1, 1 == RegExp.$1.length ? _0x4cb401[_0xeba19] : ("00" + _0x4cb401[_0xeba19]).substr(("" + _0x4cb401[_0xeba19]).length)));
-      return _0xc16e28;
-    }
-    async showmsg() {
-      if (!this.notifyFlag) {
-        return;
-      }
-      if (!this.notifyStr) {
-        return;
-      }
-      let _0x1fb760 = this.name + " 运行通知\n\n" + this.notifyStr;
-      if (_0x1558be.isNode()) {
-        var _0x1d65b1 = require("./sendNotify");
-        console.log("\n============== 推送 ==============");
-        await _0x1d65b1.sendNotify(this.name, _0x1fb760);
-      } else {
-        this.msg(_0x1fb760);
-      }
-    }
-    logAndNotify(_0x357cd8, _0xe27ce1 = true) {
-      if (_0xe27ce1) {
-        this.notifyFlag = true;
-      }
-      console.log(_0x357cd8);
-      this.notifyStr += _0x357cd8;
-      this.notifyStr += "\n";
-    }
-    logAndNotifyWithTime(_0x32ca32, _0xa5fe9 = true) {
-      if (_0xa5fe9) {
-        this.notifyFlag = true;
-      }
-      let _0x3c9607 = "[" + this.time("hh:mm:ss.S") + "]" + _0x32ca32;
-      console.log(_0x3c9607);
-      this.notifyStr += _0x3c9607;
-      this.notifyStr += "\n";
-    }
-    logWithTime(_0x55b317) {
-      console.log("[" + this.time("hh:mm:ss.S") + "]" + _0x55b317);
-    }
-    msg(_0x182f6a = t, _0x583d34 = "", _0x44ca46 = "", _0x44a649) {
-      const _0x1a0028 = _0x38fa24 => {
-        if (!_0x38fa24) {
-          return _0x38fa24;
-        }
-        if ("string" == typeof _0x38fa24) {
-          return this.isLoon() ? _0x38fa24 : this.isQuanX() ? {
-            "open-url": _0x38fa24
-          } : this.isSurge() ? {
-            url: _0x38fa24
-          } : void 0;
-        }
-        if ("object" == typeof _0x38fa24) {
-          if (this.isLoon()) {
-            let _0x1a0ad7 = _0x38fa24.openUrl || _0x38fa24.url || _0x38fa24["open-url"],
-              _0x44574c = _0x38fa24.mediaUrl || _0x38fa24["media-url"];
-            const _0x40061e = {
-              openUrl: _0x1a0ad7,
-              mediaUrl: _0x44574c
-            };
-            return _0x40061e;
-          }
-          if (this.isQuanX()) {
-            let _0x3155d7 = _0x38fa24["open-url"] || _0x38fa24.url || _0x38fa24.openUrl,
-              _0x6b169c = _0x38fa24["media-url"] || _0x38fa24.mediaUrl;
-            const _0x2a8120 = {
-              "open-url": _0x3155d7,
-              "media-url": _0x6b169c
-            };
-            return _0x2a8120;
-          }
-          if (this.isSurge()) {
-            let _0x585030 = _0x38fa24.url || _0x38fa24.openUrl || _0x38fa24["open-url"];
-            const _0x484bd6 = {
-              url: _0x585030
-            };
-            return _0x484bd6;
-          }
+              case "Loon":
+              case "Shadowrocket":
+                return t;
+              case "Quantumult X":
+                return {
+                  "open-url": t
+                };
+              case "Node.js":
+                return;
+            }
+          case "object":
+            switch (this.getEnv()) {
+              case "Surge":
+              case "Stash":
+              case "Shadowrocket":
+              default:
+                {
+                  const r = {};
+                  let a = t.openUrl || t.url || t["open-url"] || e;
+                  a && Object.assign(r, {
+                    action: "open-url",
+                    url: a
+                  });
+                  let n = t["update-pasteboard"] || t.updatePasteboard || s;
+                  if (n && Object.assign(r, {
+                    action: "clipboard",
+                    text: n
+                  }), i) {
+                    let t, e, s;
+                    if (i.startsWith("http")) {
+                      t = i;
+                    } else {
+                      if (i.startsWith("data:")) {
+                        const [t] = i.split(";"),
+                          [, o] = i.split(",");
+                        e = o;
+                        s = t.replace("data:", "");
+                      } else {
+                        e = i;
+                        s = (t => {
+                          const e = {
+                            JVBERi0: "application/pdf",
+                            R0lGODdh: "image/gif",
+                            R0lGODlh: "image/gif",
+                            iVBORw0KGgo: "image/png",
+                            "/9j/": "image/jpg"
+                          };
+                          for (var s in e) if (0 === t.indexOf(s)) {
+                            return e[s];
+                          }
+                          return null;
+                        })(i);
+                      }
+                    }
+                    Object.assign(r, {
+                      "media-url": t,
+                      "media-base64": e,
+                      "media-base64-mime": o ?? s
+                    });
+                  }
+                  Object.assign(r, {
+                    "auto-dismiss": t["auto-dismiss"],
+                    sound: t.sound
+                  });
+                  return r;
+                }
+              case "Loon":
+                {
+                  const s = {};
+                  let o = t.openUrl || t.url || t["open-url"] || e;
+                  o && Object.assign(s, {
+                    openUrl: o
+                  });
+                  let r = t.mediaUrl || t["media-url"];
+                  i?.startsWith("http") && (r = i);
+                  r && Object.assign(s, {
+                    mediaUrl: r
+                  });
+                  console.log(JSON.stringify(s));
+                  return s;
+                }
+              case "Quantumult X":
+                {
+                  const o = {};
+                  let r = t["open-url"] || t.url || t.openUrl || e;
+                  r && Object.assign(o, {
+                    "open-url": r
+                  });
+                  let a = t["media-url"] || t.mediaUrl;
+                  i?.startsWith("http") && (a = i);
+                  a && Object.assign(o, {
+                    "media-url": a
+                  });
+                  let n = t["update-pasteboard"] || t.updatePasteboard || s;
+                  n && Object.assign(o, {
+                    "update-pasteboard": n
+                  });
+                  console.log(JSON.stringify(o));
+                  return o;
+                }
+              case "Node.js":
+                return;
+            }
+          default:
+            return;
         }
       };
-      this.isMute || (this.isSurge() || this.isLoon() ? $notification.post(_0x182f6a, _0x583d34, _0x44ca46, _0x1a0028(_0x44a649)) : this.isQuanX() && $notify(_0x182f6a, _0x583d34, _0x44ca46, _0x1a0028(_0x44a649)));
-      let _0x472169 = ["", "============== 系统通知 =============="];
-      _0x472169.push(_0x182f6a);
-      _0x583d34 && _0x472169.push(_0x583d34);
-      _0x44ca46 && _0x472169.push(_0x44ca46);
-      console.log(_0x472169.join("\n"));
-    }
-    getMin(_0x14a829, _0x4f6485) {
-      return _0x14a829 < _0x4f6485 ? _0x14a829 : _0x4f6485;
-    }
-    getMax(_0x27a80f, _0x4bfe5b) {
-      return _0x27a80f < _0x4bfe5b ? _0x4bfe5b : _0x27a80f;
-    }
-    padStr(_0x397113, _0x292598, _0x577c29 = "0") {
-      let _0x294519 = String(_0x397113),
-        _0x277a64 = _0x292598 > _0x294519.length ? _0x292598 - _0x294519.length : 0,
-        _0x533ae7 = "";
-      for (let _0x364aec = 0; _0x364aec < _0x277a64; _0x364aec++) {
-        _0x533ae7 += _0x577c29;
-      }
-      _0x533ae7 += _0x294519;
-      return _0x533ae7;
-    }
-    json2str(_0x324847, _0x2ba4c0, _0x39933b = false) {
-      let _0x355024 = [];
-      for (let _0x4b1ef2 of Object.keys(_0x324847).sort()) {
-        let _0x3b680f = _0x324847[_0x4b1ef2];
-        if (_0x3b680f && _0x39933b) {
-          _0x3b680f = encodeURIComponent(_0x3b680f);
-        }
-        _0x355024.push(_0x4b1ef2 + "=" + _0x3b680f);
-      }
-      return _0x355024.join(_0x2ba4c0);
-    }
-    str2json(_0x5bb8d5, _0x229adf = false) {
-      let _0x1caa52 = {};
-      for (let _0x24f00b of _0x5bb8d5.split("&")) {
-        if (!_0x24f00b) {
-          continue;
-        }
-        let _0x55fb4e = _0x24f00b.indexOf("=");
-        if (_0x55fb4e == -1) {
-          continue;
-        }
-        let _0x32fcd6 = _0x24f00b.substr(0, _0x55fb4e),
-          _0x47d724 = _0x24f00b.substr(_0x55fb4e + 1);
-        if (_0x229adf) {
-          _0x47d724 = decodeURIComponent(_0x47d724);
-        }
-        _0x1caa52[_0x32fcd6] = _0x47d724;
-      }
-      return _0x1caa52;
-    }
-    randomPattern(_0x4b7ef6, _0x246e7d = "abcdef0123456789") {
-      let _0x41d0e2 = "";
-      for (let _0x46764f of _0x4b7ef6) {
-        if (_0x46764f == "x") {
-          _0x41d0e2 += _0x246e7d.charAt(Math.floor(Math.random() * _0x246e7d.length));
-        } else {
-          _0x46764f == "X" ? _0x41d0e2 += _0x246e7d.charAt(Math.floor(Math.random() * _0x246e7d.length)).toUpperCase() : _0x41d0e2 += _0x46764f;
+      if (!this.isMute) {
+        switch (this.getEnv()) {
+          case "Surge":
+          case "Loon":
+          case "Stash":
+          case "Shadowrocket":
+          default:
+            $notification.post(e, s, i, r(o));
+            break;
+          case "Quantumult X":
+            $notify(e, s, i, r(o));
+            break;
+          case "Node.js":
+            break;
         }
       }
-      return _0x41d0e2;
-    }
-    randomString(_0x23b47e, _0x4f6ffd = "abcdef0123456789") {
-      let _0xdcd72b = "";
-      for (let _0x49a828 = 0; _0x49a828 < _0x23b47e; _0x49a828++) {
-        _0xdcd72b += _0x4f6ffd.charAt(Math.floor(Math.random() * _0x4f6ffd.length));
-      }
-      return _0xdcd72b;
-    }
-    randomList(_0x4eb24b) {
-      let _0x237f96 = Math.floor(Math.random() * _0x4eb24b.length);
-      return _0x4eb24b[_0x237f96];
-    }
-    wait(_0x244bac) {
-      return new Promise(_0x3915f5 => setTimeout(_0x3915f5, _0x244bac));
-    }
-    async done(_0x57003b = {}) {
-      await this.showmsg();
-      const _0x1845a8 = new Date().getTime(),
-        _0x53aec7 = (_0x1845a8 - this.startTime) / 1000;
-      console.log("\n" + this.name + " 运行结束，共运行了 " + _0x53aec7 + " 秒！");
-      if (this.isSurge() || this.isQuanX() || this.isLoon()) {
-        $done(_0x57003b);
+      if (!this.isMuteLog) {
+        let t = ["", "==============📣系统通知📣=============="];
+        t.push(e);
+        s && t.push(s);
+        i && t.push(i);
+        console.log(t.join("\n"));
+        this.logs = this.logs.concat(t);
       }
     }
-  }(_0x414333, _0x174318);
+    debug(...t) {
+      this.logLevels[this.logLevel] <= this.logLevels.debug && (t.length > 0 && (this.logs = [...this.logs, ...t]), console.log(`${this.logLevelPrefixs.debug}${t.map(t => t ?? String(t)).join(this.logSeparator)}`));
+    }
+    info(...t) {
+      this.logLevels[this.logLevel] <= this.logLevels.info && (t.length > 0 && (this.logs = [...this.logs, ...t]), console.log(`${this.logLevelPrefixs.info}${t.map(t => t ?? String(t)).join(this.logSeparator)}`));
+    }
+    warn(...t) {
+      this.logLevels[this.logLevel] <= this.logLevels.warn && (t.length > 0 && (this.logs = [...this.logs, ...t]), console.log(`${this.logLevelPrefixs.warn}${t.map(t => t ?? String(t)).join(this.logSeparator)}`));
+    }
+    error(...t) {
+      this.logLevels[this.logLevel] <= this.logLevels.error && (t.length > 0 && (this.logs = [...this.logs, ...t]), console.log(`${this.logLevelPrefixs.error}${t.map(t => t ?? String(t)).join(this.logSeparator)}`));
+    }
+    log(...t) {
+      t.length > 0 && (this.logs = [...this.logs, ...t]);
+      console.log(t.map(t => t ?? String(t)).join(this.logSeparator));
+    }
+    logErr(t, e) {
+      switch (this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        case "Quantumult X":
+        default:
+          this.log("", `❗️${this.name}, 错误!`, e, t);
+          break;
+        case "Node.js":
+          this.log("", `❗️${this.name}, 错误!`, e, void 0 !== t.message ? t.message : t, t.stack);
+          break;
+      }
+    }
+    wait(t) {
+      return new Promise(e => setTimeout(e, t));
+    }
+    done(t = {}) {
+      const e = (new Date().getTime() - this.startTime) / 1000;
+      switch (this.log("", `🔔${this.name}, 结束! 🕛 ${e} 秒`), this.log(), this.getEnv()) {
+        case "Surge":
+        case "Loon":
+        case "Stash":
+        case "Shadowrocket":
+        case "Quantumult X":
+        default:
+          $done(t);
+          break;
+        case "Node.js":
+          process.exit(1);
+      }
+    }
+  }(t, e);
 }

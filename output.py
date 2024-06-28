@@ -1,58 +1,95 @@
-#2024-06-28 15:19:00
-import requests
-import os
+#2024-06-28 15:21:25
+import requests,os
 import time
 import random
-import hashlib
+import json
+import base64
+from Crypto.Cipher import AES
 class yuanshen():
  def __init__(self,cookie):
-  self.cookie=cookie
-  self.h={"Host":"app.zhuanbang.net","accept":"application/json, image/webp","user-agent":"Mozilla/5.0 (Linux; Android 12; M2104K10AC Build/SP1A.210812.016; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36 HuoNiuFusion/1.25.0_231652","x-requested-with":"XMLHttpRequest","sec-fetch-site":"same-origin","sec-fetch-mode":"cors","sec-fetch-dest":"empty","referer":"https://app.zhuanbang.net/assist/activity/47","accept-language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","accept-encoding":"gzip","Cookie":f"NiuToken={self.cookie}"}
- def sign_(self):
-  d=f"{self.csrftoken}#{self.sessionId}#{self.time}"
-  byte_string=d.encode('utf-8')
-  sha1=hashlib.sha1()
-  sha1.update(byte_string)
-  sign=sha1.hexdigest()
-  return sign
- def video(self,key):
-  i=0
-  while True:
-   i+=1
-   url=f"https://app.zhuanbang.net/{key}/launch?_random={int(time.time() * 1000)}&type=slide"
-   r=requests.get(url,headers=self.h).json()
-   if r['code']==0:
-    print(f"第[{i}]个红包获取信息成功")
-    self.csrftoken=r['data']['extArgs']['csrfToken']
-    self.sessionId=r['data']['extArgs']['sessionId']
-    self.time=int(time.time())
-    url=f"https://app.zhuanbang.net/{key}/award/grant?_t={self.time}"
-    data={"csrfToken":f"{self.csrftoken}","deviceId":f"{self.sessionId}","timestamp":f"{self.time}","sign":f"{self.sign_()}"}
-    r=requests.post(url,headers=self.h,data=data).json()
-    if r['code']==0:
-     print(f"第[{i}]个红包领取成功,获得[{r['data']['awardMoney']}]元")
-    else:
-     print(f"第[{i}]个红包领取失败---[{r['msg']}]")
-     break
-   else:
-    print(f"第[{i}]个获取红包信息失败---[{r['msg']}]")
-    break
-   if i>=21:
-    break
-   time.sleep(random.randint(20,48))
+  self.cookie=cookie.split("#")[0]
+  self.n=cookie.split("#")[1]
+  if self.n=="2":
+   self.url="zrt2.716jcp.fun"
+  elif self.n=="1":
+   self.url="zrtt.jcp716.fun"
+  elif self.n=="3":
+   self.url="zz3.716sxjcp.fun"
+  elif self.n=="5":
+   self.url="k2.716sxjcp.fun"
+  elif self.n=="6":
+   self.url="k3.716sxjcp.fun"
+  else:
+   print("请输入正确的区号")
+   exit(0)
+  self.key="XDXDXU_ZHIHUAWCC"
+  self.iv="XDXDXU_ZHIHUAWEI"
+  self.header={"Host":f"{self.url}","Connection":"keep-alive","browser":"Wechat","terminal":"1","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.120 Mobile Safari/537.36 XWEB/1220053 MMWEBSDK/20240404 MMWEBID/98 MicroMessenger/8.0.49.2600(0x28003133) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","token":f"{self.cookie}","Accept":"*/*","X-Requested-With":"com.tencent.mm","Referer":f"http://{self.url}/app/","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"}
+ def encry(self,m):
+  input_bytes=m.encode('utf-8')
+  key_bytes=self.key.encode('utf-8')
+  iv_bytes=self.iv.encode('utf-8')
+  padding_length=AES.block_size-len(input_bytes)%AES.block_size
+  padded_input=input_bytes+bytes([padding_length]*padding_length)
+  cipher=AES.new(key_bytes,AES.MODE_CBC,iv_bytes)
+  encrypted_bytes=cipher.encrypt(padded_input)
+  encrypted_base64=base64.b64encode(encrypted_bytes).decode('utf-8')
+  return encrypted_base64
+ def deencry(self,m):
+  encrypted_bytes=base64.b64decode(m)
+  key_bytes=self.key.encode('utf-8')
+  iv_bytes=self.iv.encode('utf-8')
+  cipher=AES.new(key_bytes,AES.MODE_CBC,iv_bytes)
+  decrypted_bytes=cipher.decrypt(encrypted_bytes)
+  padding_length=decrypted_bytes[-1]
+  decrypted_text=decrypted_bytes[:-padding_length]
+  return decrypted_text.decode('utf-8')
+ def task(self):
+  id_=[]
+  if True:
+   url=f"http://{self.url}/api/card/topCardLists"
+   r=requests.get(url,headers=self.header).json()
+   if r['code']==1:
+    for i in r['data']:
+     j=json.loads(json.dumps(i))
+     if j['id']not in id_:
+      print(f"开始执行ID[{j['id']}]")
+     else:
+      print(f"⛔️ID[{j['id']}]已经执行过了")
+      continue
+     url=f"http://{self.url}/api/card/createReadLog"
+     data={"id":j['id']}
+     r=requests.post(url,headers=self.header,data=data).json()
+     if r['code']==1:
+      data=r['data']['token']
+      k=json.loads(self.deencry(data))
+      addtime=random.randint(6,10)
+      postdat=json.dumps({"id":k['card_id'],"card_id":k['card_id'],"app_id":k['app_id'],"token":k['token'],"user_id":k['user_id'],"time":int(k['time'])+addtime,"t":int(k['t'])+addtime*1000})
+      postdat=self.encry(postdat)
+      time.sleep(addtime)
+      url=f"http://{self.url}/api/card/cardReadBack"
+      data={"data":f"{postdat}"}
+      r=requests.post(url,headers=self.header,data=data).json()
+      if r['code']==1:
+       print(f"🎉️执行成功ID[{j['id']}],获得[{r['data']['draw_money']}]元")
+       time.sleep(random.randint(10,30))
+      else:
+       print(f"⛔️执行失败ID[{j['id']}]----[{r['msg']}]")
+       time.sleep(random.randint(10,30))
+     else:
+      print(f"⛔️执行失败ID[{j['id']}]----[{r['msg']}]")
+      time.sleep(random.randint(10,30))
+     id_.append(j['id'])
  def main(self):
-  print("===========开始执行快手刷视频===========")
-  self.video("kwai_video")
-  print("===========快手刷视频执行完毕===========")
-  print("===========开始执行抖音刷视频===========")
-  self.video("pangle_video")
-  print("===========抖音刷视频执行完毕===========")
+  for i in range(2):
+   self.task()
 if __name__=='__main__':
- cookie=''
+ print(requests.get(f"https://gitee.com/HuaJiB/yuanshen34/raw/master/pubilc.txt").text)
+ cookie='0b5dd794-cafe-4a1f-bcb3-972574681702#6'
  if not cookie:
-  cookie=os.getenv("yuanshen_zb")
+  cookie=os.getenv("yuanshen_zrt")
   if not cookie:
-   print("⛔️请设置环境变量:yuanshen_zb")
+   print("⛔️请设置环境变量:yuanshen_zrt⛔️")
    exit()
  cookies=cookie.split("@")
  print(f"一共获取到{len(cookies)}个账号")
@@ -62,4 +99,5 @@ if __name__=='__main__':
   main=yuanshen(cookie)
   main.main()
   print(f"--------第{i}个账号执行完毕--------")
+  time.sleep(20)
   i+=1

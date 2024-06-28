@@ -1,103 +1,233 @@
-#2024-06-28 15:21:25
-import requests,os
+#2024-06-28 15:23:00
+import os
+import requests
 import time
 import random
-import json
-import base64
-from Crypto.Cipher import AES
+import re
+from urllib.parse import urlparse,parse_qs,quote
+from functools import wraps
+import threading
+from concurrent.futures import ThreadPoolExecutor,as_completed
+import hashlib
+lock=threading.Lock()
+def printf(m):
+ with lock:
+  print(m)
+def version():
+ print(requests.get("https://gitee.com/HuaJiB/yuanshen34/raw/master/pubilc.txt").text)
+def get_bizlist():
+ global bizlist
+ try:
+  bizlist=requests.get("https://gitee.com/HuaJiB/yuanshen34/raw/master/bizlist.txt").text.replace('"','').replace(' ','').split(",")
+  print(f"🎉️从云服务器加载检测文章配置成功")
+ except:
+  print("⛔️从云服务器加载检测文章配置失败")
+  bizlist=[]
+def get_setting():
+ global list
+ try:
+  list=requests.get("https://gitee.com/HuaJiB/yuanshen34/raw/master/yuernum.txt").text
+  list=list.split(",")
+  list=[int(i)for i in list]
+  print(f"🎉️从云服务器加载强检配置成功:{list}")
+ except:
+  print("⛔️从云服务器加载强检配置失败")
+  list=[]
+def retry(exceptions,tries=5,delay=2,backoff=2):
+ def decorator(func):
+  @wraps(func)
+  def wrapper(*args,**kwargs):
+   _tries,_delay=tries,delay
+   while _tries>1:
+    try:
+     return func(*args,**kwargs)
+    except exceptions as e:
+     print(f"发生错误:[{e}], Retrying in {_delay} ...")
+     time.sleep(_delay)
+     _tries-=1
+     _delay*=backoff
+   try:
+    return func(*args,**kwargs)
+   except:
+    print("重试了还失败。重开得了")
+    exit()
+  return wrapper
+ return decorator
 class yuanshen():
- def __init__(self,cookie):
-  self.cookie=cookie.split("#")[0]
-  self.n=cookie.split("#")[1]
-  if self.n=="2":
-   self.url="zrt2.716jcp.fun"
-  elif self.n=="1":
-   self.url="zrtt.jcp716.fun"
-  elif self.n=="3":
-   self.url="zz3.716sxjcp.fun"
-  elif self.n=="5":
-   self.url="k2.716sxjcp.fun"
-  elif self.n=="6":
-   self.url="k3.716sxjcp.fun"
-  else:
-   print("请输入正确的区号")
-   exit(0)
-  self.key="XDXDXU_ZHIHUAWCC"
-  self.iv="XDXDXU_ZHIHUAWEI"
-  self.header={"Host":f"{self.url}","Connection":"keep-alive","browser":"Wechat","terminal":"1","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.120 Mobile Safari/537.36 XWEB/1220053 MMWEBSDK/20240404 MMWEBID/98 MicroMessenger/8.0.49.2600(0x28003133) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","token":f"{self.cookie}","Accept":"*/*","X-Requested-With":"com.tencent.mm","Referer":f"http://{self.url}/app/","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"}
- def encry(self,m):
-  input_bytes=m.encode('utf-8')
-  key_bytes=self.key.encode('utf-8')
-  iv_bytes=self.iv.encode('utf-8')
-  padding_length=AES.block_size-len(input_bytes)%AES.block_size
-  padded_input=input_bytes+bytes([padding_length]*padding_length)
-  cipher=AES.new(key_bytes,AES.MODE_CBC,iv_bytes)
-  encrypted_bytes=cipher.encrypt(padded_input)
-  encrypted_base64=base64.b64encode(encrypted_bytes).decode('utf-8')
-  return encrypted_base64
- def deencry(self,m):
-  encrypted_bytes=base64.b64decode(m)
-  key_bytes=self.key.encode('utf-8')
-  iv_bytes=self.iv.encode('utf-8')
-  cipher=AES.new(key_bytes,AES.MODE_CBC,iv_bytes)
-  decrypted_bytes=cipher.decrypt(encrypted_bytes)
-  padding_length=decrypted_bytes[-1]
-  decrypted_text=decrypted_bytes[:-padding_length]
-  return decrypted_text.decode('utf-8')
- def task(self):
-  id_=[]
-  if True:
-   url=f"http://{self.url}/api/card/topCardLists"
-   r=requests.get(url,headers=self.header).json()
-   if r['code']==1:
-    for i in r['data']:
-     j=json.loads(json.dumps(i))
-     if j['id']not in id_:
-      print(f"开始执行ID[{j['id']}]")
+ def __init__(self,cookie,num)->None:
+  self.num=num
+  self.cookie=cookie
+  self.num_list=list
+  if "=" in self.cookie:
+   printf("ck格式错误 呆瓜，PHPSESSID=不要给我放进去，ok？")
+   exit()
+  self.biz_=bizlist
+ @retry(exceptions=Exception,tries=5,delay=2,backoff=2)
+ def getmain(self):
+  headers={"Host":"h5.5rjb1a5u3w6.cn","Connection":"keep-alive","Upgrade-Insecure-Requests":"1","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.120 Mobile Safari/537.36 XWEB/1220053 MMWEBSDK/20240404 MMWEBID/98 MicroMessenger/8.0.49.2600(0x28003133) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/wxpic,image/tpg,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7","X-Requested-With":"com.tencent.mm","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","Cookie":f"PHPSESSID={self.cookie}"}
+  url="http://h5.5rjb1a5u3w6.cn/pipa_read?upuid=2220314"
+  r=requests.get(url,headers=headers,allow_redirects=False)
+  redirect_url=r.headers.get('Location')
+  self.mainurl=urlparse(redirect_url).netloc
+  printf(f"🎉️第[{self.num}]个账号获取到主域名[{self.mainurl}]")
+ def readnum(self):
+  try:
+   url=f"http://{self.mainurl}/pipa_read/"
+   r=requests.get(url,headers=self.h3).text
+   match=re.search(r'今日已读(\d+)篇',r)
+   if match:
+    printf(f"第[{self.num}]个账号获取已读文章数成功")
+    return int(match.group(1))
+   else:
+    printf(f"第[{self.num}]个账号获取已读文章数失败")
+    return None
+  except Exception as e:
+   printf(f"第[{self.num}]个账号获取已读文章数失败{e}")
+   return None
+ def tuisong(self):
+  url=f"https://wxpusher.zjiecode.com/api/send/message/?appToken={appToken}&topicId={topicIds}&content=检测文章%0A请在20秒内完成验证!%0A%3Cbody+onload%3D%22window.location.href%3D%27{quote(self.readurl)}%27%22%3E"
+  r=requests.get(url).json()
+  printf(f"🎉️第[{self.num}]个账号检测文章推送结果{r}")
+ def getdoamin(self):
+  try:
+   url=f"http://{self.mainurl}/read_task/ggg3"
+   r=requests.get(url,headers=self.h).json()
+   kurl=r['jump'].replace('\\','')
+   j=urlparse(kurl)
+   fragment=kurl.split('#')[-1]
+   self.domain=j.netloc
+   match=re.search(r'iu=([^&]*)',fragment)
+   self.iu=match.group(1)if match else None
+   printf(f"🎉️第[{self.num}]个账号获取到阅读域名[{self.domain}][{self.iu}]")
+   r=requests.get(kurl,headers=self.h).text
+   md5=hashlib.md5(r.encode('utf-8')).hexdigest()
+   printf(f"阅读域名校准值:[{md5}]")
+   if md5!="4a64138395ea3f63281fc325fa0f8b90":
+    print("检测到接口代码发生变化，火速跑路，台子抓人了")
+    exit()
+   if "rd" not in kurl:
+    print("检测到接口链接发生变化，火速跑路，台子抓人了")
+    exit()
+  except Exception as e:
+   printf(f"第[{self.num}]个账号获取到阅读域名失败{e} 不会是封号了吧叼毛")
+   exit()
+ def read(self):
+  num=self.readnum()+1
+  jkey=None
+  while True:
+   num+=1
+   r=random.random()
+   if jkey is None:
+    url=f"http://{self.domain}/read_task/ddr?iu={self.iu}&type=7,7&r={r}"
+   else:
+    url=f"http://{self.domain}/read_task/ddr?iu={self.iu}&type=7,7&r={r}&jkey={jkey}"
+   r=requests.get(url,headers=self.h2).json()
+   try:
+    jkey,self.readurl=r['jkey'],r['url']
+    k=urlparse(self.readurl)
+    printf(f"✅️第[{self.num}]个账号获取文章成功[{self.readurl}]")
+    biz=parse_qs(k.query).get('__biz',[''])[0]if '__biz' in parse_qs(k.query)else ''
+    if biz not in self.biz_:
+     if num in self.num_list:
+      printf(f"第[{self.num}]个账号触发强检，推送ing...")
+      self.tuisong()
+      time.sleep(random.randint(20,30))
      else:
-      print(f"⛔️ID[{j['id']}]已经执行过了")
-      continue
-     url=f"http://{self.url}/api/card/createReadLog"
-     data={"id":j['id']}
-     r=requests.post(url,headers=self.header,data=data).json()
-     if r['code']==1:
-      data=r['data']['token']
-      k=json.loads(self.deencry(data))
-      addtime=random.randint(6,10)
-      postdat=json.dumps({"id":k['card_id'],"card_id":k['card_id'],"app_id":k['app_id'],"token":k['token'],"user_id":k['user_id'],"time":int(k['time'])+addtime,"t":int(k['t'])+addtime*1000})
-      postdat=self.encry(postdat)
-      time.sleep(addtime)
-      url=f"http://{self.url}/api/card/cardReadBack"
-      data={"data":f"{postdat}"}
-      r=requests.post(url,headers=self.header,data=data).json()
-      if r['code']==1:
-       print(f"🎉️执行成功ID[{j['id']}],获得[{r['data']['draw_money']}]元")
-       time.sleep(random.randint(10,30))
-      else:
-       print(f"⛔️执行失败ID[{j['id']}]----[{r['msg']}]")
-       time.sleep(random.randint(10,30))
+      time.sleep(random.randint(9,16))
+    else:
+     printf(f"第[{self.num}]个账号遇到检测文章，推送ing...")
+     self.tuisong()
+     time.sleep(random.randint(20,30))
+    printf(f"🎉️第[{self.num}]个账号第[{num}]篇文章阅读成功！")
+    if 'error' in r['url']:
+     printf(f"⛔️第[{self.num}]个账号第[{num}]篇文章阅读失败！[{r['url']}]大概是本轮已经读完了，一小时再来运行俺")
+     break
+   except:
+    printf(f"⛔️第[{self.num}]个账号第[{num}]篇文章阅读失败！大概是本轮已经读完了，一小时再来运行俺")
+    try:
+     printf(f"⛔️第[{self.num}]个账号阅读失败原因：[{r['url']}]")
+     url=f"http://{self.domain}/read_task/finish?iu={self.iu}&type=7&type=7&upuid=&_t=799888"
+     r=requests.get(url,headers=self.h2)
+     if r.status_code==200:
+      printf(f"✅️第[{self.num}]个账号阅读任务完成！")
      else:
-      print(f"⛔️执行失败ID[{j['id']}]----[{r['msg']}]")
-      time.sleep(random.randint(10,30))
-     id_.append(j['id'])
+      printf(f"⛔️第[{self.num}]个账号阅读任务完成失败！")
+     break
+    except:
+     printf(f"⛔️第[{self.num}]个账号阅读任务完成失败！未知错误")
+ @retry(exceptions=Exception,tries=5,delay=2,backoff=2)
+ def userinfo(self):
+  h={"Host":f"{self.mainurl}","Connection":"keep-alive","Upgrade-Insecure-Requests":"1","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.120 Mobile Safari/537.36 XWEB/1220053 MMWEBSDK/20240404 MMWEBID/98 MicroMessenger/8.0.49.2600(0x28003133) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/wxpic,image/tpg,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7","X-Requested-With":"com.tencent.mm","Referer":f"http://{self.mainurl}/pipa_read/user/","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","Cookie":f"PHPSESSID={self.cookie}"}
+  url=f"http://{self.mainurl}/withdrawal"
+  r=requests.get(url,headers=h).text
+  m=re.compile(r'<p class="withdraw-main-myinfo-money"><span>([\d\.]+)</span>')
+  match=m.search(r)
+  if match:
+   printf(f"💰️第[{self.num}]个账号当前余额：[{float(match.group(1))/100}]")
+   if float(match.group(1))/100>=withdrawal_money:
+    url=f"http://{self.mainurl}/withdrawal/submit_withdraw"
+    data={"channel":"wechat","money":f"{match.group(1)}"}
+    r=requests.post(url,data=data,headers=self.h_2).json()
+    if r['code']==0:
+     printf(f"🎉️第[{self.num}]个账号提现[{float(match.group(1))/100}]成功[{r['msg']}]！")
+    else:printf(f"⛔️第[{self.num}]个账号提现失败[{r['msg']}]！")
+   else:printf(f"⛔️第[{self.num}]个账号当前余额不足[{withdrawal_money}],无法提现")
+  else:printf(f"⛔️第[{self.num}]个账号获取余额失败！")
  def main(self):
-  for i in range(2):
-   self.task()
+  self.getmain()
+  self.h={"Host":f"{self.mainurl}","Connection":"keep-alive","Accept":"*/*","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.120 Mobile Safari/537.36 XWEB/1220053 MMWEBSDK/20240404 MMWEBID/98 MicroMessenger/8.0.49.2600(0x28003133) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","X-Requested-With":"XMLHttpRequest","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","Cookie":f"PHPSESSID={self.cookie}"}
+  self.h_2={"Host":f"{self.mainurl}","Connection":"keep-alive","Accept":"*/*","X-Requested-With":"XMLHttpRequest","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.120 Mobile Safari/537.36 XWEB/1220053 MMWEBSDK/20240404 MMWEBID/98 MicroMessenger/8.0.49.2600(0x28003133) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","Content-Type":"application/x-www-form-urlencoded","Origin":f"http://{self.mainurl}","Referer":f"http://{self.mainurl}/withdrawal","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","Cookie":f"PHPSESSID={self.cookie}"}
+  self.getdoamin()
+  print("======================")
+  self.h2={"Host":f"{self.domain}","Connection":"keep-alive","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.120 Mobile Safari/537.36 XWEB/1220053 MMWEBSDK/20240404 MMWEBID/98 MicroMessenger/8.0.49.2600(0x28003133) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","X-Requested-With":"XMLHttpRequest","Accept":"*/*","Referer":f"http://{self.domain}/read_task/rd2/","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","Cookie":f"PHPSESSID={self.cookie}"}
+  self.h3={"Host":f"{self.mainurl}","Connection":"keep-alive","Upgrade-Insecure-Requests":"1","User-Agent":"Mozilla/5.0 (Linux; Android 13; 23054RA19C Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Mobile Safari/537.36 XWEB/1160117 MMWEBSDK/20240404 MMWEBID/9158 MicroMessenger/8.0.49.2600(0x2800313B) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64","Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/wxpic,image/tpg,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7","X-Requested-With":"com.tencent.mm","Referer":f"http://{self.mainurl}/pipa_read/user/","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","Cookie":f"PHPSESSID={self.cookie}"}
+  self.read()
+  print("======================")
+  self.userinfo()
+  print("===================")
 if __name__=='__main__':
- print(requests.get(f"https://gitee.com/HuaJiB/yuanshen34/raw/master/pubilc.txt").text)
- cookie='0b5dd794-cafe-4a1f-bcb3-972574681702#6'
+ appToken=""
+ topicIds=""
+ version()
+ get_setting()
+ get_bizlist()
+ if not appToken:
+  appToken=os.getenv("yuanshen_apptoken")
+  if not appToken:
+   print("❌你还没有设置推送,请设置环境变量:yuanshen_apptoken")
+   exit()
+ if not topicIds:
+  topicIds=os.getenv("yuanshen_topicid")
+  if not topicIds:
+   print("❌你还没有设置推送,请设置环境变量:yuanshen_topicid")
+   exit()
+ cookie=''
  if not cookie:
-  cookie=os.getenv("yuanshen_zrt")
+  cookie=os.getenv("yuanshen_yuer")
   if not cookie:
-   print("⛔️请设置环境变量:yuanshen_zrt⛔️")
+   print("请设置环境变量:yuanshen_yuer")
    exit()
  cookies=cookie.split("@")
  print(f"一共获取到{len(cookies)}个账号")
- i=1
- for cookie in cookies:
-  print(f"\n--------开始第{i}个账号--------")
-  main=yuanshen(cookie)
-  main.main()
-  print(f"--------第{i}个账号执行完毕--------")
-  time.sleep(20)
-  i+=1
+ if max_threads!=1:
+  tasks=[]
+  num=1
+  with ThreadPoolExecutor(max_workers=max_threads)as executor:
+   futures=[]
+   for ck in cookies:
+    task=yuanshen(ck,num)
+    future=executor.submit(task.main)
+    futures.append(future)
+    time.sleep(10)
+    num+=1
+   results=[future.result()for future in as_completed(futures)]
+  print("所有任务执行完毕")
+ else:
+  i=1
+  for cookie in cookies:
+   printf(f"\n--------开始第{i}个账号--------")
+   main=yuanshen(cookie,i)
+   main.main()
+   printf(f"--------第{i}个账号执行完毕--------")
+   time.sleep(20)
+   i+=1
